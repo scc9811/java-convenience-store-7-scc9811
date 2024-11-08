@@ -1,6 +1,7 @@
 package store.controller;
 
 import store.entity.Product;
+import store.entity.Promotion;
 import store.service.StoreService;
 import store.view.OutputView;
 
@@ -14,6 +15,6 @@ public class StoreController {
     public void run() {
         OutputView.printWelcomeMessage();
         List<Product> products = storeService.getProducts();
-
+        List<Promotion> promotions = storeService.getPromotions();
     }
 }
