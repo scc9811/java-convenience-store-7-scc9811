@@ -2,7 +2,7 @@ package store.controller;
 
 import store.view.OutputView;
 
-public class ConvenienceController {
+public class ConvenienceStoreController {
     public void run() {
         OutputView.printWelcomeMessage();
     }

@@ -1,9 +1,9 @@
 package store;
 
-import store.controller.ConvenienceController;
+import store.controller.ConvenienceStoreController;
 
 public class Application {
     public static void main(String[] args) {
-        new ConvenienceController().run();
+        new ConvenienceStoreController().run();
     }
 }
