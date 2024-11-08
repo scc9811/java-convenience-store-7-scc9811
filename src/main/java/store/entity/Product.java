@@ -26,3 +26,4 @@ public class Product {
     public int getQuantity() {
         return quantity;
     }
+}
