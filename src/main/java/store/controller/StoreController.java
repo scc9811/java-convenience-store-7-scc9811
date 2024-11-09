@@ -2,11 +2,13 @@ package store.controller;
 
 import store.entity.Product;
 import store.entity.Promotion;
+import store.entity.RequestItem;
 import store.service.StoreService;
 import store.util.ParseUtil;
 import store.view.InputView;
 import store.view.OutputView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StoreController {
@@ -22,6 +24,9 @@ public class StoreController {
         OutputView.printInputPurchase();
         String purchase = InputView.getUserInput();
         purchase = ParseUtil.removeSpace(purchase);
+        List<RequestItem> requestItems = storeService.getRequestItems(purchase);
+
+
 
     }
 }
