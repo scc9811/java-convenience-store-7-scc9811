@@ -5,13 +5,16 @@ import store.entity.Product;
 import store.entity.Promotion;
 import store.entity.RequestItem;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StoreService {
     private final FileReader fileReader;
+    private final LocalDate today;
     public StoreService() {
         this.fileReader = new FileReader();
+        this.today = LocalDate.now();
     }
 
     private List<String> readProductsInfo() {
@@ -70,5 +73,37 @@ public class StoreService {
             }
         }
         return true;
+    }
+    public boolean containsPromotion(List<Product> products, List<Promotion> promotions, RequestItem requestItem) {
+        Product promotionProduct = getPromotionProduct(products, requestItem.getName());
+        if (promotionProduct == null) {
+            return false;
+        }
+        Promotion promotion = getPromotion(promotions, promotionProduct.getPromotion());
+        if (today.isBefore(promotion.getStartDate()) || today.isAfter(promotion.getEndDate())) {
+            return false;
+        }
+        return true;
+    }
+
+    public Product getNomalProduct(List<Product> products, String name) {
+        for (Product product : products) {
+            if (product.getName().equals(name) && product.getPromotion() == null) return product;
+        }
+        return null;
+    }
+
+    public Product getPromotionProduct(List<Product> products, String name) {
+        for (Product product : products) {
+            if (product.getName().equals(name) && product.getPromotion() != null && product.getQuantity() > 0) return product;
+        }
+        return null;
+    }
+
+    public Promotion getPromotion(List<Promotion> promotions, String name) {
+        for (Promotion promotion : promotions) {
+            if (promotion.getName().equals(name)) return promotion;
+        }
+        return null;
     }
 }
