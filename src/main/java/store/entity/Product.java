@@ -16,6 +16,14 @@ public class Product {
         }
     }
 
+    public void plusQuantity(int size) {
+        quantity += size;
+    }
+
+    public void minusQuantity(int size) {
+        quantity -= size;
+    }
+
     public String getName() {
         return name;
     }
