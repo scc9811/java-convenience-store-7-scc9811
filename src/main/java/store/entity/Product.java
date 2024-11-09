@@ -1,5 +1,7 @@
 package store.entity;
 
+import store.util.ParseUtil;
+
 public class Product {
     private String name, promotion;
     private int price, quantity;
@@ -9,6 +11,9 @@ public class Product {
         this.price = price;
         this.quantity = quantity;
         this.promotion = promotion;
+        if (promotion.equals("null")) {
+            this.promotion = null;
+        }
     }
 
     public String getName() {
@@ -25,5 +30,19 @@ public class Product {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public String info() {
+        String productInfo = "- " + name + " " + ParseUtil.numberFormat(price) + "원 ";
+        if (quantity == 0) {
+            productInfo = productInfo + "재고 없음 ";
+        }
+        if (quantity != 0) {
+            productInfo = productInfo + ParseUtil.numberFormat(quantity) + "개 ";
+        }
+        if (promotion != null) {
+            productInfo = productInfo + promotion;
+        }
+        return productInfo;
     }
 }

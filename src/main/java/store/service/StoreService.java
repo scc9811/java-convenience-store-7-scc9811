@@ -14,7 +14,6 @@ public class StoreService {
     }
 
     private List<String> readProductsInfo() {
-        System.out.println(fileReader.readFile("products.md"));
         return fileReader.readFile("products.md");
     }
 
