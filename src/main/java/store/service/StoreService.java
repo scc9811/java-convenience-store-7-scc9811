@@ -38,7 +38,7 @@ public class StoreService {
         List<String> promotionsInfo = readPromotionsInfo();
         List<Promotion> promotions = new ArrayList<>();
         for (int i = 1; i < promotionsInfo.size(); i++) {
-            List<String> tokens = List.of(promotionsInfo.get(i));
+            List<String> tokens = List.of(promotionsInfo.get(i).split(","));
             promotions.add(
                     new Promotion(tokens.get(0), Integer.parseInt(tokens.get(1)),
                             Integer.parseInt(tokens.get(2)), tokens.get(3), tokens.get(4)));
