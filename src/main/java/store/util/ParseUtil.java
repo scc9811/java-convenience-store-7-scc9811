@@ -10,4 +10,8 @@ public class ParseUtil {
     public static String numberFormat(int n) {
         return FORMATTER.format(n);
     }
+
+    public static String removeSpace(String input) {
+        return input.replaceAll("\\s+", "");
+    }
 }
