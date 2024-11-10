@@ -1,5 +1,6 @@
 package store.service;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import store.entity.*;
 
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ public class StoreService {
     private final LocalDate today;
     public StoreService() {
         this.fileReader = new FileReader();
-        this.today = LocalDate.now();
+        this.today = DateTimes.now().toLocalDate();
     }
 
     private List<String> readProductsInfo() {
