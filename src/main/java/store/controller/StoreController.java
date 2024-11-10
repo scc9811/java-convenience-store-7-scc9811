@@ -48,7 +48,8 @@ public class StoreController {
                 storeService.calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
             }
             // 일반 상품 계산
-            storeService.calculateNormalProduct();
+            Product normalProduct = storeService.getNomalProduct(products, requestItem.getName());
+            storeService.calculateNormalProduct(normalProduct, requestItem, receipt);
 
         }
 

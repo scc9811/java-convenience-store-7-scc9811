@@ -85,6 +85,20 @@ public class StoreService {
         promotionProduct.minusQuantity(calculateQuantity);
     }
 
+    public void calculateNormalProduct(Product normalProduct, RequestItem requestItem, Receipt receipt) {
+        // 이미 구매 완료한 경우 바로 Return
+        if (receipt.getPurchasedCount().get(requestItem.getName()) == requestItem.getQuantity()) {
+            return;
+        }
+        // 구매하야 할 수량 남은 경우 계산
+        Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
+        int lastCount = purchasedCount.get(normalProduct.getName());
+        int calculateQuantity = requestItem.getQuantity() - lastCount;
+        receipt.totalPay += normalProduct.getPrice() * calculateQuantity;
+        purchasedCount.put(normalProduct.getName(), lastCount + calculateQuantity);
+        normalProduct.minusQuantity(calculateQuantity);
+    }
+
     public boolean containsPromotion(List<Product> products, List<Promotion> promotions, RequestItem requestItem) {
         Product promotionProduct = getPromotionProduct(products, requestItem.getName());
         if (promotionProduct == null) {
