@@ -72,6 +72,10 @@ public class StoreController {
             storeService.membershipDiscount(receipt);
         }
 
+        // 영수증 출력
+        OutputView.printReceipt(products, receipt);
+
+
         OutputView.printInputRepurchase();
         String repurchaseInput = InputView.getUserInput();
         boolean isRepurchase = ParseUtil.booleanParse(repurchaseInput);

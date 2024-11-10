@@ -1,7 +1,11 @@
 package store.view;
 
+import store.entity.PresentedProduct;
 import store.entity.Product;
-import store.util.ParseUtil;
+import store.entity.Receipt;
+import store.entity.RequestItem;
+
+import static store.util.ParseUtil.*;
 
 import java.util.List;
 
@@ -14,8 +18,55 @@ public class OutputView {
     private static final String MEMBERSHIP_DISCOUNT_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
 
     private static final String REPURCHASE_MESSAGE = "감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)";
+    private static final String RECEIPT_HEADER = "==============W 편의점================\n상품명\t\t수량\t금액\n";
+    private static final String PRESENTATION_LINE = "=============증\t정===============\n";
+    private static final String DIVIDE_LINE = "====================================\n";
+    private static final String TOTAL_PURCHASE_AMOUNT = "총구매액";
+    private static final String EVENT_DISCOUNT = "행사할인";
+    private static final String MEMBERSHIP_DISCOUNT = "멤버십할인";
+    private static final String TOTAL_PAY_MONEY = "내실돈";
 
     private OutputView() {
+    }
+
+    public static void printReceipt(List<Product> products, Receipt receipt) {
+        StringBuilder receiptBuilder = new StringBuilder();
+        receiptBuilder.append(RECEIPT_HEADER);
+        List<RequestItem> requestItems = receipt.getRequestItems();
+        for (RequestItem requestItem : requestItems) {
+            receiptBuilder.append(requestItem.getName()).append("\t\t")
+                    .append(requestItem.getQuantity()).append(" \t");
+            for (Product product : products) {
+                if (product.getName().equals(requestItem.getName())) {
+                    receiptBuilder.append(numberFormat(product.getPrice() * requestItem.getQuantity())).append('\n');
+                    break;
+                }
+            }
+        }
+
+        receiptBuilder.append(PRESENTATION_LINE);
+        List<PresentedProduct> presentedProducts = receipt.getPresentedProducts();
+        for (PresentedProduct product : presentedProducts) {
+            receiptBuilder.append(product.getName()).append("\t\t")
+                    .append(numberFormat(product.getQuantity())).append('\n');
+        }
+
+        receiptBuilder.append(DIVIDE_LINE);
+        receiptBuilder.append(TOTAL_PURCHASE_AMOUNT).append("\t\t")
+                .append(numberFormat(receipt.totalPurchasedProductsCount()))
+                .append('\t').append(receipt.getTotalPurchaseAmount()).append('\n');
+
+        receiptBuilder.append(EVENT_DISCOUNT).append("\t\t\t-")
+                .append(numberFormat(receipt.getEventDisCount())).append('\n');
+
+        receiptBuilder.append(MEMBERSHIP_DISCOUNT).append("\t\t\t-")
+                .append(numberFormat(receipt.getMembershipDiscount())).append('\n');
+
+        receiptBuilder.append(TOTAL_PAY_MONEY).append("\t\t\t ")
+                .append(numberFormat(receipt.totalPayMoney()));
+
+        System.out.println(receiptBuilder);
+
     }
 
     public static void printWelcomeMessage() {
@@ -38,7 +89,7 @@ public class OutputView {
     }
 
     public static void printInputNonePromotion(String name, int remainRequestSize) {
-        System.out.printf(NONE_PROMOTION_MESSAGE, name, ParseUtil.numberFormat(remainRequestSize));
+        System.out.printf(NONE_PROMOTION_MESSAGE, name, numberFormat(remainRequestSize));
     }
 
     public static void printInputMembershipDiscount() {

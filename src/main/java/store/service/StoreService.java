@@ -76,9 +76,13 @@ public class StoreService {
     // 가능한 최대한 프로모션 상품 결제.
     public void calculatePromotionProduct(Product promotionProduct, Promotion promotion, RequestItem requestItem, Receipt receipt) {
         int calculateQuantity = Math.min(requestItem.getQuantity(), promotionProduct.getQuantity());
-        receipt.totalPay += promotionProduct.getPrice() * calculateQuantity;
+        receipt.totalPurchaseAmount += promotionProduct.getPrice() * calculateQuantity;
         int bundle = promotion.getBuy() + promotion.getGet();
-        receipt.eventDisCount += promotionProduct.getPrice() * (calculateQuantity / bundle);
+        int presentedProductCount = calculateQuantity / bundle;
+        receipt.eventDisCount += promotionProduct.getPrice() * presentedProductCount;
+        if (presentedProductCount > 0) {
+            receipt.getPresentedProducts().add(new PresentedProduct(promotionProduct.getName(), presentedProductCount));
+        }
         Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
         int lastCount = purchasedCount.get(promotionProduct.getName());
         purchasedCount.put(promotionProduct.getName(), lastCount + calculateQuantity);
@@ -94,7 +98,7 @@ public class StoreService {
         Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
         int lastCount = purchasedCount.get(normalProduct.getName());
         int calculateQuantity = requestItem.getQuantity() - lastCount;
-        receipt.totalPay += normalProduct.getPrice() * calculateQuantity;
+        receipt.totalPurchaseAmount += normalProduct.getPrice() * calculateQuantity;
         purchasedCount.put(normalProduct.getName(), lastCount + calculateQuantity);
         normalProduct.minusQuantity(calculateQuantity);
     }
@@ -137,7 +141,7 @@ public class StoreService {
     }
 
     public void membershipDiscount(Receipt receipt) {
-        int priceToApplyMembership = receipt.getTotalPay() - receipt.getEventDisCount();
+        int priceToApplyMembership = receipt.getTotalPurchaseAmount() - receipt.getEventDisCount();
         int disCountPrice = Math.max((int) Math.round(priceToApplyMembership * 0.7) ,8000);
         receipt.setMembershipDiscount(disCountPrice);
     }
