@@ -131,4 +131,8 @@ public class StoreService {
         }
         return null;
     }
+
+    public int remainRequestCount(RequestItem requestItem, Receipt receipt) {
+        return requestItem.getQuantity() - receipt.getPurchasedCount().get(requestItem.getName());
+    }
 }

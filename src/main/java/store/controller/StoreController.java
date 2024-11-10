@@ -39,22 +39,36 @@ public class StoreController {
                 if (promotionProduct.getQuantity() >= requestSize && requestSize % bundle == bundle - 1) {
                     OutputView.printInputAdd();
                     String addInput = InputView.getUserInput();
-                    boolean isGiftSelected = ParseUtil.isGiftSelected(addInput);
+                    boolean isGiftSelected = ParseUtil.booleanParse(addInput);
                     if (isGiftSelected) {
                         requestItem.plusQuantity(1);
                     }
                 }
                 // 프로모션 상품 계산
                 storeService.calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
+
+                // 일반 상품으로 계산해야 하는 상품이 남는 경우 -> 입출력
+                int remainRequestSize = storeService.remainRequestCount(requestItem, receipt);
+                if (remainRequestSize > 0) {
                     OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize);
                     String NonePromotionInput = InputView.getUserInput();
                     boolean purchaseRegularPrice = ParseUtil.booleanParse(NonePromotionInput);
+                    // none promotion product 포함시키지 않는 경우 -> 해당 사이즈 만큼 제외.
+                    if (!purchaseRegularPrice) {
+                        requestItem.minusQuantity(remainRequestSize);
+                    }
+                }
             }
             // 일반 상품 계산
             Product normalProduct = storeService.getNomalProduct(products, requestItem.getName());
             storeService.calculateNormalProduct(normalProduct, requestItem, receipt);
 
         }
+        // 멤버십 할인 적용 여부 -> 입출력
+
+
+
+        // 추가 구매 여부 -> 입출
 
 
 

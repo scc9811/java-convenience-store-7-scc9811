@@ -8,6 +8,10 @@ public class RequestItem {
         quantity += size;
     }
 
+    public void minusQuantity(int size) {
+        quantity -= size;
+    }
+
     public RequestItem(String name, int quantity) {
         this.name = name;
         this.quantity = quantity;
