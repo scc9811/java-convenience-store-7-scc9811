@@ -135,4 +135,10 @@ public class StoreService {
     public int remainRequestCount(RequestItem requestItem, Receipt receipt) {
         return requestItem.getQuantity() - receipt.getPurchasedCount().get(requestItem.getName());
     }
+
+    public void membershipDiscount(Receipt receipt) {
+        int priceToApplyMembership = receipt.getTotalPay() - receipt.getEventDisCount();
+        int disCountPrice = Math.max((int) Math.round(priceToApplyMembership * 0.7) ,8000);
+        receipt.setMembershipDiscount(disCountPrice);
+    }
 }

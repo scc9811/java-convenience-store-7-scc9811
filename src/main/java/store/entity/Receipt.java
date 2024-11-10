@@ -46,4 +46,8 @@ public class Receipt {
     public int getMembershipDiscount() {
         return membershipDiscount;
     }
+
+    public void setMembershipDiscount(int membershipDiscount) {
+        this.membershipDiscount = membershipDiscount;
+    }
 }

@@ -68,7 +68,9 @@ public class StoreController {
         OutputView.printInputMembershipDiscount();
         String isMembershipInput = InputView.getUserInput();
         boolean isMembership = ParseUtil.booleanParse(isMembershipInput);
-
+        if (isMembership) {
+            storeService.membershipDiscount(receipt);
+        }
 
 
         // 추가 구매 여부 -> 입출
