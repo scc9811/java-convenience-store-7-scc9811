@@ -72,9 +72,7 @@ public class StoreController {
             storeService.membershipDiscount(receipt);
         }
 
-
-        // 추가 구매 여부 -> 입출
-
+        OutputView.printInputRepurchase();
 
 
 
