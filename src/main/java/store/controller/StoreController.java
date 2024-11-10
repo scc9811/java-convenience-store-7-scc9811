@@ -6,6 +6,7 @@ import store.entity.Receipt;
 import store.entity.RequestItem;
 import store.service.StoreService;
 import store.util.ParseUtil;
+import store.validator.ProductValidator;
 import store.view.InputView;
 import store.view.OutputView;
 
@@ -22,10 +23,13 @@ public class StoreController {
         storeService.addNormalProduct(products);
         List<Promotion> promotions = storeService.getPromotions();
         OutputView.printProductsInfo(products);
+
         OutputView.printInputPurchase();
         String purchase = InputView.getUserInput();
         purchase = ParseUtil.removeSpace(purchase);
         List<RequestItem> requestItems = storeService.getRequestItems(purchase);
+        ProductValidator.validateShortage(requestItems, products);
+
         Receipt receipt = new Receipt(requestItems);
         for (RequestItem requestItem : requestItems) {
             // 프로모션 재고가 있는 경우 -> 프로모션 상품 먼저 소진

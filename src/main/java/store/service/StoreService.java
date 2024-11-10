@@ -62,21 +62,6 @@ public class StoreService {
         return requestItems;
     }
 
-    public boolean isShortage(List<RequestItem> requestItems, List<Product> products) {
-        for (RequestItem requestItem : requestItems) {
-            int productTotalCount = 0;
-            for (Product product : products) {
-                if (requestItem.getName().equals(product.getName())) {
-                    productTotalCount += product.getQuantity();
-                }
-            }
-            if (productTotalCount < requestItem.getQuantity()) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     // 가능한 최대한 프로모션 상품 결제.
     public void calculatePromotionProduct(Product promotionProduct, Promotion promotion, RequestItem requestItem, Receipt receipt) {
         int calculateQuantity = Math.min(requestItem.getQuantity(), promotionProduct.getQuantity());
