@@ -52,8 +52,8 @@ public class StoreService {
         List<RequestItem> requestItems = new ArrayList<>();
         for (String token : tokens) {
             List<String> purchaseToken = List.of(token.substring(1, token.length()-1).split("-"));
-            requestItems.add(new RequestItem(purchaseToken.get(0).substring(1),
-                    Integer.parseInt(purchaseToken.get(1).substring(0, purchaseToken.size()-1))));
+            requestItems.add(new RequestItem(purchaseToken.get(0),
+                    Integer.parseInt(purchaseToken.get(1))));
         }
         return requestItems;
     }
