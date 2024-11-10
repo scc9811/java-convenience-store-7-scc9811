@@ -65,6 +65,7 @@ public class StoreController {
 
         }
         // 멤버십 할인 적용 여부 -> 입출력
+        OutputView.printInputMembershipDiscount();
 
 
 

@@ -10,6 +10,8 @@ public class OutputView {
     private static final String ADD_MESSAGE = "현재 %s은(는) 1개를 무료로 더 받을 수 있습니다. 추가하시겠습니까? (Y/N)";
     private static final String NONE_PROMOTION_MESSAGE = "현재 %s %s개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)";
 
+    private static final String MEMBERSHIP_DISCOUNT_MESSAGE = "멤버십 할인을 받으시겠습니까? (Y/N)";
+
     private OutputView() {
     }
 
@@ -34,5 +36,9 @@ public class OutputView {
 
     public static void printInputNonePromotion(String name, int remainRequestSize) {
         System.out.printf(NONE_PROMOTION_MESSAGE, name, remainRequestSize);
+    }
+
+    public static void printInputMembershipDiscount() {
+        System.out.println(MEMBERSHIP_DISCOUNT_MESSAGE);
     }
 }
