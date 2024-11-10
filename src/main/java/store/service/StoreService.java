@@ -55,7 +55,7 @@ public class StoreService {
         ParseValidator.validateTokens(tokens);
         List<RequestItem> requestItems = new ArrayList<>();
         for (String token : tokens) {
-            List<String> purchaseToken = List.of(token.substring(1, token.length()-1).split("-"));
+            List<String> purchaseToken = List.of(token.substring(1, token.length() - 1).split("-"));
             requestItems.add(new RequestItem(purchaseToken.get(0),
                     Integer.parseInt(purchaseToken.get(1))));
         }
@@ -128,7 +128,9 @@ public class StoreService {
 
     public Product getPromotionProduct(List<Product> products, String name) {
         for (Product product : products) {
-            if (product.getName().equals(name) && product.getPromotion() != null && product.getQuantity() > 0) return product;
+            if (product.getName().equals(name) && product.getPromotion() != null && product.getQuantity() > 0) {
+                return product;
+            }
         }
         return null;
     }
@@ -146,16 +148,16 @@ public class StoreService {
 
     public void membershipDiscount(Receipt receipt) {
         int priceToApplyMembership = receipt.getTotalPurchaseAmount() - receipt.getEventDisCount();
-        int disCountPrice = Math.max((int) Math.round(priceToApplyMembership * 0.7) ,8000);
+        int disCountPrice = Math.max((int) Math.round(priceToApplyMembership * 0.7), 8000);
         receipt.setMembershipDiscount(disCountPrice);
     }
 
     public void addNormalProduct(List<Product> products) {
         for (int i = 0; i < products.size() - 1; i++) {
             Product currentProduct = products.get(i);
-            Product nextProduct = products.get(i+1);
+            Product nextProduct = products.get(i + 1);
             if (currentProduct.getPromotion() != null && !currentProduct.getName().equals(nextProduct.getName())) {
-                products.add(i+1, new Product(currentProduct.getName(), currentProduct.getPrice(), 0, "null"));
+                products.add(i + 1, new Product(currentProduct.getName(), currentProduct.getPrice(), 0, "null"));
                 i += 1;
             }
         }
