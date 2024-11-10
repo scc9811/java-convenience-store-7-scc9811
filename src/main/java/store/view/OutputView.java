@@ -1,6 +1,7 @@
 package store.view;
 
 import store.entity.Product;
+import store.util.ParseUtil;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class OutputView {
     }
 
     public static void printInputNonePromotion(String name, int remainRequestSize) {
-        System.out.printf(NONE_PROMOTION_MESSAGE, name, remainRequestSize);
+        System.out.printf(NONE_PROMOTION_MESSAGE, name, ParseUtil.numberFormat(remainRequestSize));
     }
 
     public static void printInputMembershipDiscount() {
