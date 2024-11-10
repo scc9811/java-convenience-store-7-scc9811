@@ -28,6 +28,7 @@ public class StoreController {
         String purchase = InputView.getUserInput();
         purchase = ParseUtil.removeSpace(purchase);
         List<RequestItem> requestItems = storeService.getRequestItems(purchase);
+        ProductValidator.validateProductExist(requestItems, products);
         ProductValidator.validateShortage(requestItems, products);
 
         Receipt receipt = new Receipt(requestItems);
