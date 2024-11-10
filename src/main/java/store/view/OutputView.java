@@ -54,7 +54,7 @@ public class OutputView {
         receiptBuilder.append(DIVIDE_LINE);
         receiptBuilder.append(TOTAL_PURCHASE_AMOUNT).append("\t\t")
                 .append(numberFormat(receipt.totalPurchasedProductsCount()))
-                .append('\t').append(receipt.getTotalPurchaseAmount()).append('\n');
+                .append('\t').append(numberFormat(receipt.getTotalPurchaseAmount())).append('\n');
 
         receiptBuilder.append(EVENT_DISCOUNT).append("\t\t\t-")
                 .append(numberFormat(receipt.getEventDisCount())).append('\n');
