@@ -73,6 +73,9 @@ public class StoreController {
         }
 
         OutputView.printInputRepurchase();
+        String repurchaseInput = InputView.getUserInput();
+        boolean isRepurchase = ParseUtil.booleanParse(repurchaseInput);
+
 
 
 
