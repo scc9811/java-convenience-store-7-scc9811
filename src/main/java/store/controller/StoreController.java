@@ -2,6 +2,7 @@ package store.controller;
 
 import store.entity.Product;
 import store.entity.Promotion;
+import store.entity.Receipt;
 import store.entity.RequestItem;
 import store.service.StoreService;
 import store.util.ParseUtil;
@@ -24,9 +25,9 @@ public class StoreController {
         String purchase = InputView.getUserInput();
         purchase = ParseUtil.removeSpace(purchase);
         List<RequestItem> requestItems = storeService.getRequestItems(purchase);
+        Receipt receipt = new Receipt(requestItems);
         for (RequestItem requestItem : requestItems) {
-            int total, eventDiscount, membershipDiscount;
-            // 프로모션 상품 먼저 소진
+            // 프로모션 재고가 있는 경우 -> 프로모션 상품 먼저 소진
             if (storeService.containsPromotion(products, promotions, requestItem)) {
                 Product promotionProduct = storeService.getPromotionProduct(products, requestItem.getName());
                 Promotion promotion = storeService.getPromotion(promotions, promotionProduct.getPromotion());
@@ -34,7 +35,7 @@ public class StoreController {
                 int requestSize = requestItem.getQuantity();
                 // 1. 프로모션 상품이 충분한 경우
                 // 2. (배수-1) 의 수량을 만족하는 경우
-                // 프로모션 상품 추가여부 묻는 경우는 계산 완료된 것.
+                // 프로모션 상품 추가여부 묻는 경우는 계산 완료된 것. ( 이 경우만 따로 고려하지 말고, request item+1 이후에 계산할것. )
                 if (promotionProduct.getQuantity() >= requestSize && requestSize % bundle == bundle - 1) {
                     OutputView.printInputAdd();
                     String addInput = InputView.getUserInput();
@@ -43,12 +44,12 @@ public class StoreController {
                         requestItem.plusQuantity(1);
                     }
                 }
+                // 프로모션 상품 계산
+                storeService.calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
             }
-            // 일반 상품 소진
-            if (!storeService.containsPromotion(products, promotions, requestItem)) {
+            // 일반 상품 계산
+            storeService.calculateNormalProduct();
 
-            }
-//            storeService.calculateEachItem(products, promotions, requestItem);
         }
 
 

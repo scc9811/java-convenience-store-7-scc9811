@@ -1,13 +1,11 @@
 package store.service;
 
-import store.entity.FileReader;
-import store.entity.Product;
-import store.entity.Promotion;
-import store.entity.RequestItem;
+import store.entity.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class StoreService {
     private final FileReader fileReader;
@@ -74,6 +72,19 @@ public class StoreService {
         }
         return true;
     }
+
+    // 가능한 최대한 프로모션 상품 결제.
+    public void calculatePromotionProduct(Product promotionProduct, Promotion promotion, RequestItem requestItem, Receipt receipt) {
+        int calculateQuantity = Math.min(requestItem.getQuantity(), promotionProduct.getQuantity());
+        receipt.totalPay += promotionProduct.getPrice() * calculateQuantity;
+        int bundle = promotion.getBuy() + promotion.getGet();
+        receipt.eventDisCount += promotionProduct.getPrice() * (calculateQuantity / bundle);
+        Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
+        int lastCount = purchasedCount.get(promotionProduct.getName());
+        purchasedCount.put(promotionProduct.getName(), lastCount + calculateQuantity);
+        promotionProduct.minusQuantity(calculateQuantity);
+    }
+
     public boolean containsPromotion(List<Product> products, List<Promotion> promotions, RequestItem requestItem) {
         Product promotionProduct = getPromotionProduct(products, requestItem.getName());
         if (promotionProduct == null) {
