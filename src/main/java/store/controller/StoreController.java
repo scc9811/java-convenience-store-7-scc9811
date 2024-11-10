@@ -46,6 +46,9 @@ public class StoreController {
                 }
                 // 프로모션 상품 계산
                 storeService.calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
+                    OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize);
+                    String NonePromotionInput = InputView.getUserInput();
+                    boolean purchaseRegularPrice = ParseUtil.booleanParse(NonePromotionInput);
             }
             // 일반 상품 계산
             Product normalProduct = storeService.getNomalProduct(products, requestItem.getName());
