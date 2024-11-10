@@ -146,4 +146,15 @@ public class StoreService {
         int disCountPrice = Math.max((int) Math.round(priceToApplyMembership * 0.7) ,8000);
         receipt.setMembershipDiscount(disCountPrice);
     }
+
+    public void addNormalProduct(List<Product> products) {
+        for (int i = 0; i < products.size() - 1; i++) {
+            Product currentProduct = products.get(i);
+            Product nextProduct = products.get(i+1);
+            if (currentProduct.getPromotion() != null && !currentProduct.getName().equals(nextProduct.getName())) {
+                products.add(i+1, new Product(currentProduct.getName(), currentProduct.getPrice(), 0, "null"));
+                i += 1;
+            }
+        }
+    }
 }

@@ -19,6 +19,7 @@ public class StoreController {
     public void run() {
         OutputView.printWelcomeMessage();
         List<Product> products = storeService.getProducts();
+        storeService.addNormalProduct(products);
         List<Promotion> promotions = storeService.getPromotions();
         OutputView.printProductsInfo(products);
         OutputView.printInputPurchase();
