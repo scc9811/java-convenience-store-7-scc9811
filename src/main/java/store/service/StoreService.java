@@ -2,6 +2,7 @@ package store.service;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import store.entity.*;
+import store.validator.ParseValidator;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Map;
 public class StoreService {
     private final FileReader fileReader;
     private final LocalDate today;
+
     public StoreService() {
         this.fileReader = new FileReader();
         this.today = DateTimes.now().toLocalDate();
@@ -50,6 +52,7 @@ public class StoreService {
 
     public List<RequestItem> getRequestItems(String purchase) {
         List<String> tokens = List.of(purchase.split(","));
+        ParseValidator.validateTokens(tokens);
         List<RequestItem> requestItems = new ArrayList<>();
         for (String token : tokens) {
             List<String> purchaseToken = List.of(token.substring(1, token.length()-1).split("-"));
