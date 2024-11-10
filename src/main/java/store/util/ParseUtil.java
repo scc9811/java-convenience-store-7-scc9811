@@ -15,7 +15,7 @@ public class ParseUtil {
         return input.replaceAll("\\s+", "");
     }
 
-    public static boolean isGiftSelected(String addInput) {
+    public static boolean booleanParse(String addInput) {
         addInput = removeSpace(addInput);
         if (addInput.equals("N")) {
             return false;
