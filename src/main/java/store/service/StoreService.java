@@ -2,7 +2,10 @@ package store.service;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import store.entity.*;
+import store.util.ParseUtil;
 import store.validator.ParseValidator;
+import store.view.InputView;
+import store.view.OutputView;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -16,14 +19,6 @@ public class StoreService {
     public StoreService() {
         this.fileReader = new FileReader();
         this.today = DateTimes.now().toLocalDate();
-    }
-
-    private List<String> readProductsInfo() {
-        return fileReader.readFile("products.md");
-    }
-
-    private List<String> readPromotionsInfo() {
-        return fileReader.readFile("promotions.md");
     }
 
     public List<Product> getProducts() {
@@ -146,5 +141,97 @@ public class StoreService {
                 i += 1;
             }
         }
+    }
+
+    public void treatRequest(List<Product> products, List<Promotion> promotions, List<RequestItem> requestItems, Receipt receipt) {
+        for (RequestItem requestItem : requestItems) {
+            eachRequestItem(products, promotions, requestItem, receipt);
+        }
+    }
+
+    private void eachRequestItem(List<Product> products, List<Promotion> promotions, RequestItem requestItem, Receipt receipt) {
+        // 프로모션 재고가 있는 경우 -> 프로모션 상품 먼저 소진
+        if (containsPromotion(products, promotions, requestItem)) {
+            sellPromotionProduct(products, promotions, requestItem, receipt);
+        }
+        sellNormalProduct(products, requestItem, receipt);
+    }
+
+    private void sellPromotionProduct(List<Product> products, List<Promotion> promotions, RequestItem requestItem, Receipt receipt) {
+        Product promotionProduct = getPromotionProduct(products, requestItem.getName());
+        Promotion promotion = getPromotion(promotions, promotionProduct.getPromotion());
+        int bundle = promotion.getBuy() + promotion.getGet();
+        int requestSize = requestItem.getQuantity();
+        addPromotionProduct(promotionProduct, requestItem, bundle, requestSize);
+        calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
+        removeNormalProduct(requestItem, receipt);
+    }
+
+    private void removeNormalProduct(RequestItem requestItem, Receipt receipt) {
+        int remainRequestSize = remainRequestCount(requestItem, receipt);
+        if (remainRequestSize > 0) {
+            OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize);
+            repeatAskRemoval(requestItem, remainRequestSize);
+        }
+    }
+
+    private void repeatAskRemoval(RequestItem requestItem, int remainRequestSize) {
+        try {
+            askRemoval(requestItem, remainRequestSize);
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            repeatAskRemoval(requestItem, remainRequestSize);
+        }
+    }
+
+    private void askRemoval(RequestItem requestItem, int remainRequestSize) {
+        String NonePromotionInput = InputView.getUserInput();
+        boolean purchaseRegularPrice = ParseUtil.booleanParse(NonePromotionInput);
+        if (!purchaseRegularPrice) {
+            requestItem.minusQuantity(remainRequestSize);
+        }
+    }
+
+    private void addPromotionProduct(Product promotionProduct, RequestItem requestItem, int bundle, int requestSize) {
+        if (promotionProduct.getQuantity() >= requestSize + 1 && requestSize % bundle == bundle - 1) {
+            OutputView.printInputAdd(promotionProduct.getName());
+            repeatAskPromotionProductAddition(requestItem);
+        }
+    }
+
+    private void repeatAskPromotionProductAddition(RequestItem requestItem) {
+        try {
+            askPromotionProductAddition(requestItem);
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            askPromotionProductAddition(requestItem);
+        }
+
+    }
+
+    private void askPromotionProductAddition(RequestItem requestItem) {
+        String addInput = InputView.getUserInput();
+        boolean isGiftSelected = ParseUtil.booleanParse(addInput);
+        if (isGiftSelected) {
+            requestItem.plusQuantity(1);
+        }
+    }
+
+    private void sellNormalProduct(List<Product> products, RequestItem requestItem, Receipt receipt) {
+        // 일반 상품 계산
+        Product normalProduct = getNomalProduct(products, requestItem.getName());
+        calculateNormalProduct(normalProduct, requestItem, receipt);
+    }
+
+
+
+    private List<String> readProductsInfo() {
+        return fileReader.readFile("products.md");
+    }
+
+    private List<String> readPromotionsInfo() {
+        return fileReader.readFile("promotions.md");
     }
 }
