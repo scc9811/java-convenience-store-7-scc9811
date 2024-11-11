@@ -76,6 +76,8 @@ public class StoreService {
         receipt.totalPurchaseAmount += promotionProduct.getPrice() * calculateQuantity;
         int bundle = promotion.getBuy() + promotion.getGet();
         int presentedProductCount = calculateQuantity / bundle;
+        receipt.promotionalAmount += bundle * presentedProductCount * promotionProduct.getPrice();
+        receipt.nonPromotionalAmount += calculateQuantity % bundle * promotionProduct.getPrice();
         receipt.eventDisCount += promotionProduct.getPrice() * presentedProductCount;
         addPresentedProduct(promotionProduct, receipt, presentedProductCount);
         increasePurchasedCount(promotionProduct, receipt, calculateQuantity);
@@ -101,6 +103,7 @@ public class StoreService {
         int lastCount = receipt.getPurchasedCount().get(normalProduct.getName());
         int calculateQuantity = requestItem.getQuantity() - lastCount;
         receipt.totalPurchaseAmount += normalProduct.getPrice() * calculateQuantity;
+        receipt.nonPromotionalAmount += normalProduct.getPrice() * calculateQuantity;
         receipt.getPurchasedCount().put(normalProduct.getName(), lastCount + calculateQuantity);
         normalProduct.minusQuantity(calculateQuantity);
     }
@@ -144,7 +147,7 @@ public class StoreService {
     }
 
     public void membershipDiscount(Receipt receipt) {
-        int priceToApplyMembership = receipt.getTotalPurchaseAmount() - receipt.getEventDisCount();
+        int priceToApplyMembership = receipt.nonPromotionalAmount;
         int disCountPrice = Math.min((int) Math.round(priceToApplyMembership * 0.3), 8000);
         receipt.setMembershipDiscount(disCountPrice);
     }
@@ -174,7 +177,6 @@ public class StoreService {
 
     private void eachRequestItem(List<Product> products, List<Promotion> promotions,
                                  RequestItem requestItem, Receipt receipt) {
-        // 프로모션 재고가 있는 경우 -> 프로모션 상품 먼저 소진
         if (containsPromotion(products, promotions, requestItem)) {
             sellPromotionProduct(products, promotions, requestItem, receipt);
         }
