@@ -26,12 +26,16 @@ public class StoreService {
         List<String> productsInfo = readProductsInfo();
         List<Product> products = new ArrayList<>();
         for (int i = 1; i < productsInfo.size(); i++) {
-            List<String> tokens = List.of(productsInfo.get(i).split(","));
-            products.add(
-                    new Product(tokens.get(0), Integer.parseInt(tokens.get(1)),
-                            Integer.parseInt(tokens.get(2)), tokens.get(3)));
+            addProduct(products, productsInfo.get(i));
         }
         return products;
+    }
+
+    private void addProduct(List<Product> products, String productInfo) {
+        List<String> tokens = List.of(productInfo.split(","));
+        products.add(
+                new Product(tokens.get(0), Integer.parseInt(tokens.get(1)),
+                        Integer.parseInt(tokens.get(2)), tokens.get(3)));
     }
 
     public List<Promotion> getPromotions() {
