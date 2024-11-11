@@ -198,9 +198,13 @@ public class StoreService {
         Promotion promotion = getPromotion(promotions, promotionProduct.getPromotion());
         int bundle = promotion.getBuy() + promotion.getGet();
         int requestSize = requestItem.getQuantity();
+        sellPromotionProductByBundle(promotionProduct, promotion, requestItem, receipt, bundle, requestSize);
+    }
+
+    private void sellPromotionProductByBundle(Product promotionProduct, Promotion promotion,
+                                              RequestItem requestItem, Receipt receipt, int bundle, int requestSize) {
         addPromotionProduct(promotionProduct, requestItem, bundle, requestSize);
         calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
-
         int remainRequestCount = remainRequestCount(requestItem, receipt);
         int nonPromotionCount = (requestSize - remainRequestCount) % bundle;
         int nonPromotionAmount = nonPromotionCount * promotionProduct.getPrice();
@@ -221,14 +225,17 @@ public class StoreService {
         String nonPromotionInput = isRemovalProduct();
         boolean purchaseRegularPrice = ParseUtil.booleanParse(nonPromotionInput);
         if (!purchaseRegularPrice) {
-            requestItem.minusQuantity(remainRequestSize + nonPromotionCount);
-            receipt.totalPurchaseAmount -= nonPromotionAmount;
-            receipt.promotionalAmount -= nonPromotionAmount;
-            receipt.nonPromotionalAmount -= nonPromotionAmount;
+            updateMinusReceipt(requestItem,remainRequestSize + nonPromotionCount, receipt, nonPromotionAmount);
             Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
             purchasedCount.put(requestItem.getName(), purchasedCount.get(requestItem.getName()) - nonPromotionCount);
-
         }
+    }
+
+    private static void updateMinusReceipt(RequestItem requestItem, int size, Receipt receipt, int nonPromotionAmount) {
+        requestItem.minusQuantity(size);
+        receipt.totalPurchaseAmount -= nonPromotionAmount;
+        receipt.promotionalAmount -= nonPromotionAmount;
+        receipt.nonPromotionalAmount -= nonPromotionAmount;
     }
 
     private String isRemovalProduct() {
