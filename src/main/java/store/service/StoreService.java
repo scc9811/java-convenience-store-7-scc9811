@@ -76,11 +76,16 @@ public class StoreService {
         receipt.totalPurchaseAmount += promotionProduct.getPrice() * calculateQuantity;
         int bundle = promotion.getBuy() + promotion.getGet();
         int presentedProductCount = calculateQuantity / bundle;
-        receipt.promotionalAmount += bundle * presentedProductCount * promotionProduct.getPrice();
-        receipt.nonPromotionalAmount += calculateQuantity % bundle * promotionProduct.getPrice();
-        receipt.eventDisCount += promotionProduct.getPrice() * presentedProductCount;
+        updateReceipt(receipt, bundle, presentedProductCount, calculateQuantity, promotionProduct.getPrice());
         addPresentedProduct(promotionProduct, receipt, presentedProductCount);
         increasePurchasedCount(promotionProduct, receipt, calculateQuantity);
+    }
+
+    private void updateReceipt(Receipt receipt, int bundle, int presentedProductCount,
+                               int calculateQuantity, int price) {
+        receipt.promotionalAmount += bundle * presentedProductCount * price;
+        receipt.nonPromotionalAmount += calculateQuantity % bundle * price;
+        receipt.eventDisCount += presentedProductCount * price;
     }
 
     private void addPresentedProduct(Product promotionProduct, Receipt receipt, int productCount) {
@@ -102,10 +107,14 @@ public class StoreService {
         }
         int lastCount = receipt.getPurchasedCount().get(normalProduct.getName());
         int calculateQuantity = requestItem.getQuantity() - lastCount;
-        receipt.totalPurchaseAmount += normalProduct.getPrice() * calculateQuantity;
-        receipt.nonPromotionalAmount += normalProduct.getPrice() * calculateQuantity;
+        updateReceipt(receipt, normalProduct.getPrice() * calculateQuantity);
         receipt.getPurchasedCount().put(normalProduct.getName(), lastCount + calculateQuantity);
         normalProduct.minusQuantity(calculateQuantity);
+    }
+
+    private void updateReceipt(Receipt receipt, int plusAmount) {
+        receipt.totalPurchaseAmount += plusAmount;
+        receipt.nonPromotionalAmount += plusAmount;
     }
 
     public boolean containsPromotion(List<Product> products, List<Promotion> promotions, RequestItem requestItem) {
@@ -191,22 +200,34 @@ public class StoreService {
         int requestSize = requestItem.getQuantity();
         addPromotionProduct(promotionProduct, requestItem, bundle, requestSize);
         calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
-        removeNormalProduct(requestItem, receipt);
+
+        int remainRequestCount = remainRequestCount(requestItem, receipt);
+        int nonPromotionCount = (requestSize - remainRequestCount) % bundle;
+        int nonPromotionAmount = nonPromotionCount * promotionProduct.getPrice();
+        removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount);
     }
 
-    private void removeNormalProduct(RequestItem requestItem, Receipt receipt) {
+    private void removeNormalProduct(RequestItem requestItem, Receipt receipt, int nonPromotionCount,
+                                     int nonPromotionAmount) {
         int remainRequestSize = remainRequestCount(requestItem, receipt);
-        if (remainRequestSize > 0) {
-            OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize);
-            askRemoval(requestItem, remainRequestSize);
+        if (nonPromotionCount != 0 || remainRequestSize > 0) {
+            OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize + nonPromotionCount);
+            askRemoval(requestItem, remainRequestSize, nonPromotionCount, nonPromotionAmount, receipt);
         }
     }
 
-    private void askRemoval(RequestItem requestItem, int remainRequestSize) {
+    private void askRemoval(RequestItem requestItem, int remainRequestSize,
+                            int nonPromotionCount, int nonPromotionAmount, Receipt receipt) {
         String nonPromotionInput = isRemovalProduct();
         boolean purchaseRegularPrice = ParseUtil.booleanParse(nonPromotionInput);
         if (!purchaseRegularPrice) {
-            requestItem.minusQuantity(remainRequestSize);
+            requestItem.minusQuantity(remainRequestSize + nonPromotionCount);
+            receipt.totalPurchaseAmount -= nonPromotionAmount;
+            receipt.promotionalAmount -= nonPromotionAmount;
+            receipt.nonPromotionalAmount -= nonPromotionAmount;
+            Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
+            purchasedCount.put(requestItem.getName(), purchasedCount.get(requestItem.getName()) - nonPromotionCount);
+
         }
     }
 
