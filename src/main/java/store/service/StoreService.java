@@ -42,12 +42,16 @@ public class StoreService {
         List<String> promotionsInfo = readPromotionsInfo();
         List<Promotion> promotions = new ArrayList<>();
         for (int i = 1; i < promotionsInfo.size(); i++) {
-            List<String> tokens = List.of(promotionsInfo.get(i).split(","));
-            promotions.add(
-                    new Promotion(tokens.get(0), Integer.parseInt(tokens.get(1)),
-                            Integer.parseInt(tokens.get(2)), tokens.get(3), tokens.get(4)));
+            addPromotion(promotions, promotionsInfo.get(i));
         }
         return promotions;
+    }
+
+    private void addPromotion(List<Promotion> promotions, String promotionInfo) {
+        List<String> tokens = List.of(promotionInfo.split(","));
+        promotions.add(
+                new Promotion(tokens.get(0), Integer.parseInt(tokens.get(1)),
+                        Integer.parseInt(tokens.get(2)), tokens.get(3), tokens.get(4)));
     }
 
     public List<RequestItem> getRequestItems(String purchase) {
@@ -55,12 +59,17 @@ public class StoreService {
         ParseValidator.validateTokens(tokens);
         List<RequestItem> requestItems = new ArrayList<>();
         for (String token : tokens) {
-            List<String> purchaseToken = List.of(token.substring(1, token.length() - 1).split("-"));
-            requestItems.add(new RequestItem(purchaseToken.get(0),
-                    Integer.parseInt(purchaseToken.get(1))));
+            addRequestItem(requestItems, token.substring(1, token.length() - 1));
         }
         return requestItems;
     }
+
+    private void addRequestItem(List<RequestItem> requestItems, String purchaseInfo) {
+        List<String> purchaseTokens = List.of(purchaseInfo.split("-"));
+        requestItems.add(new RequestItem(purchaseTokens.get(0),
+                Integer.parseInt(purchaseTokens.get(1))));
+    }
+
 
     // 가능한 최대한 프로모션 상품 결제.
     public void calculatePromotionProduct(Product promotionProduct, Promotion promotion, RequestItem requestItem, Receipt receipt) {
