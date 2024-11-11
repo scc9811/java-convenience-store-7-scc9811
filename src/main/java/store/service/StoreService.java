@@ -3,6 +3,7 @@ package store.service;
 import camp.nextstep.edu.missionutils.DateTimes;
 import store.entity.*;
 import store.util.ParseUtil;
+import store.validator.BooleanTypeValidator;
 import store.validator.ParseValidator;
 import store.view.InputView;
 import store.view.OutputView;
@@ -171,26 +172,28 @@ public class StoreService {
         int remainRequestSize = remainRequestCount(requestItem, receipt);
         if (remainRequestSize > 0) {
             OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize);
-            repeatAskRemoval(requestItem, remainRequestSize);
-        }
-    }
-
-    private void repeatAskRemoval(RequestItem requestItem, int remainRequestSize) {
-        try {
             askRemoval(requestItem, remainRequestSize);
-        }
-        catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            repeatAskRemoval(requestItem, remainRequestSize);
         }
     }
 
     private void askRemoval(RequestItem requestItem, int remainRequestSize) {
-        String NonePromotionInput = InputView.getUserInput();
-        boolean purchaseRegularPrice = ParseUtil.booleanParse(NonePromotionInput);
+        String nonPromotionInput = isRemovalProduct();
+        boolean purchaseRegularPrice = ParseUtil.booleanParse(nonPromotionInput);
         if (!purchaseRegularPrice) {
             requestItem.minusQuantity(remainRequestSize);
         }
+    }
+
+    private String isRemovalProduct() {
+        try {
+            String nonPromotionInput = InputView.getUserInput();
+            BooleanTypeValidator.validate(nonPromotionInput);
+            return nonPromotionInput;
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            isRemovalProduct();
+        }
+        return null;
     }
 
     private void addPromotionProduct(Product promotionProduct, RequestItem requestItem, int bundle, int requestSize) {
@@ -203,19 +206,28 @@ public class StoreService {
     private void repeatAskPromotionProductAddition(RequestItem requestItem) {
         try {
             askPromotionProductAddition(requestItem);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             askPromotionProductAddition(requestItem);
         }
-
     }
 
     private void askPromotionProductAddition(RequestItem requestItem) {
-        String addInput = InputView.getUserInput();
+        String addInput = isPromotionProductionAddition();
         boolean isGiftSelected = ParseUtil.booleanParse(addInput);
         if (isGiftSelected) {
             requestItem.plusQuantity(1);
+        }
+    }
+
+    private String isPromotionProductionAddition() {
+        try {
+            String addInput = InputView.getUserInput();
+            BooleanTypeValidator.validate(addInput);
+            return addInput;
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return isPromotionProductionAddition();
         }
     }
 
@@ -224,8 +236,6 @@ public class StoreService {
         Product normalProduct = getNomalProduct(products, requestItem.getName());
         calculateNormalProduct(normalProduct, requestItem, receipt);
     }
-
-
 
     private List<String> readProductsInfo() {
         return fileReader.readFile("products.md");

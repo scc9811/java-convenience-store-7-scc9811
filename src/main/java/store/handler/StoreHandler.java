@@ -6,6 +6,8 @@ import store.entity.Receipt;
 import store.entity.RequestItem;
 import store.service.StoreService;
 import store.util.ParseUtil;
+import store.validator.BooleanTypeValidator;
+import store.validator.ParseValidator;
 import store.validator.ProductValidator;
 import store.view.InputView;
 import store.view.OutputView;
@@ -34,24 +36,15 @@ public class StoreHandler {
         OutputView.printProductsInfo(products);
         OutputView.printInputPurchase();
         askRequestProduct();
-//        try {
-//            askRequestProduct();
-//        }
-//        catch (IllegalArgumentException e) {
-//            System.out.println(e.getMessage());
-//            askRequestProduct();
-//        }
     }
 
     private void askRequestProduct() {
         try {
             String purchase = InputView.getUserInput();
-            purchase = ParseUtil.removeSpace(purchase);
             requestItems = storeService.getRequestItems(purchase);
             ProductValidator.validateProductExist(requestItems, products);
             ProductValidator.validateShortage(requestItems, products);
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             askRequestProduct();
         }
@@ -65,20 +58,20 @@ public class StoreHandler {
 
     public void handleMembershipDiscount() {
         OutputView.printInputMembershipDiscount();
-        try {
-            askMembership();
-        }
-        catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            askMembership();
-        }
+        askMembership();
     }
 
     private void askMembership() {
-        String isMembershipInput = InputView.getUserInput();
-        boolean isMembership = ParseUtil.booleanParse(isMembershipInput);
-        if (isMembership) {
-            storeService.membershipDiscount(receipt);
+        try {
+            String isMembershipInput = InputView.getUserInput();
+            BooleanTypeValidator.validate(isMembershipInput);
+            boolean isMembership = ParseUtil.booleanParse(isMembershipInput);
+            if (isMembership) {
+                storeService.membershipDiscount(receipt);
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            askMembership();
         }
     }
 
@@ -86,12 +79,19 @@ public class StoreHandler {
         OutputView.printReceipt(products, receipt);
     }
 
-    public void handleRepurchase() {
+    public boolean handleRepurchase() {
         OutputView.printInputRepurchase();
-        String repurchaseInput = InputView.getUserInput();
-        boolean isRepurchase = ParseUtil.booleanParse(repurchaseInput);
-        if (isRepurchase) {
-            // file initialize 제외하고 다시 시작.
+        return isRepurchase();
+    }
+
+    private boolean isRepurchase() {
+        try {
+            String repurchaseInput = InputView.getUserInput();
+            BooleanTypeValidator.validate(repurchaseInput);
+            return ParseUtil.booleanParse(repurchaseInput);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return isRepurchase();
         }
     }
 }
