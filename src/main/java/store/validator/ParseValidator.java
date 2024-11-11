@@ -5,6 +5,10 @@ import java.util.List;
 
 public class ParseValidator {
     private static final int MIN = 1;
+
+    private ParseValidator() {
+    }
+
     public static void validateTokens(List<String> tokens) {
         if (tokens.size() == 0) {
             throw new IllegalArgumentException(ErrorMessage.INVALID_INPUT.getMessage());
