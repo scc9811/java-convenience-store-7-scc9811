@@ -7,7 +7,6 @@ import store.entity.RequestItem;
 import store.service.StoreService;
 import store.util.ParseUtil;
 import store.validator.BooleanTypeValidator;
-import store.validator.ParseValidator;
 import store.validator.ProductValidator;
 import store.view.InputView;
 import store.view.OutputView;
@@ -42,12 +41,16 @@ public class StoreHandler {
         try {
             String purchase = InputView.getUserInput();
             requestItems = storeService.getRequestItems(purchase);
-            ProductValidator.validateProductExist(requestItems, products);
-            ProductValidator.validateShortage(requestItems, products);
+            validateProduct();
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             askRequestProduct();
         }
+    }
+
+    private void validateProduct() {
+        ProductValidator.validateProductExist(requestItems, products);
+        ProductValidator.validateShortage(requestItems, products);
     }
 
     public void handleCalculation() {
@@ -62,16 +65,21 @@ public class StoreHandler {
     }
 
     private void askMembership() {
+        String isMembershipInput = repeatAskMemberShip();
+        boolean isMembership = ParseUtil.booleanParse(isMembershipInput);
+        if (isMembership) {
+            storeService.membershipDiscount(receipt);
+        }
+    }
+
+    private String repeatAskMemberShip() {
         try {
             String isMembershipInput = InputView.getUserInput();
             BooleanTypeValidator.validate(isMembershipInput);
-            boolean isMembership = ParseUtil.booleanParse(isMembershipInput);
-            if (isMembership) {
-                storeService.membershipDiscount(receipt);
-            }
+            return isMembershipInput;
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-            askMembership();
+            return repeatAskMemberShip();
         }
     }
 
