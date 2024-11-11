@@ -208,13 +208,13 @@ public class StoreService {
         int remainRequestCount = remainRequestCount(requestItem, receipt);
         int nonPromotionCount = (requestSize - remainRequestCount) % bundle;
         int nonPromotionAmount = nonPromotionCount * promotionProduct.getPrice();
-        removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount);
+        removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount, bundle);
     }
 
     private void removeNormalProduct(RequestItem requestItem, Receipt receipt, int nonPromotionCount,
-                                     int nonPromotionAmount) {
+                                     int nonPromotionAmount, int bundle) {
         int remainRequestSize = remainRequestCount(requestItem, receipt);
-        if (nonPromotionCount != 0 || remainRequestSize > 0) {
+        if ((bundle > 2 && nonPromotionCount != 0) || remainRequestSize > 0) {
             OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize + nonPromotionCount);
             askRemoval(requestItem, remainRequestSize, nonPromotionCount, nonPromotionAmount, receipt);
         }
