@@ -6,12 +6,18 @@ public class StoreController {
     private final StoreHandler storeHandler;
     public StoreController() {
         this.storeHandler = new StoreHandler();
+        storeHandler.handleInitialize();
     }
     public void run() {
-        storeHandler.handleInitialize();
+        boolean RequestPurchase = true;
+        while(RequestPurchase) {
+            purchase();
+            RequestPurchase = storeHandler.handleRepurchase();
+        }
+    }
+    private void purchase() {
         storeHandler.handleRequestProduct();
         storeHandler.handleCalculation();
         storeHandler.handlePrintReceipt();
-        storeHandler.handleRepurchase();
     }
 }
