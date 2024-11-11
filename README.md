@@ -160,11 +160,11 @@ N
 ### 클래스 소개
 1. StoreController
 * 프로그램의 전체적인 실행 흐름을 관리합니다.
-* StoreHandler, OutputView를 직접적으로 호출합니다.
+* StoreHandler를 직접적으로 호출합니다.
 
 2. StoreHandler
 * StoreController 와 StoreService 클래스의 중간다리 역할을 합니다.
-* StoreController의 run() 메서드의 역할을 분산하기 위해 정의한 클래스입니다.
+* StoreController의 역할을 분산하기 위해 정의한 클래스입니다.
 
 3. StoreService
 * 핵심 비지니스 로직을 처리하는 클래스입니다.
