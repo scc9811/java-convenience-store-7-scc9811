@@ -203,18 +203,23 @@ public class StoreService {
 
     private void sellPromotionProductByBundle(Product promotionProduct, Promotion promotion,
                                               RequestItem requestItem, Receipt receipt, int bundle, int requestSize) {
-        boolean okPromotion = addPromotionProduct(promotionProduct, requestItem, bundle, requestSize);
+        boolean add = addPromotionProduct(promotionProduct, requestItem, bundle, requestSize);
+        int tmp = receipt.promotionalAmount;
         calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
         int remainRequestCount = remainRequestCount(requestItem, receipt);
         int nonPromotionCount = (requestSize - remainRequestCount) % bundle;
         int nonPromotionAmount = nonPromotionCount * promotionProduct.getPrice();
+        boolean okPromotion = tmp != receipt.promotionalAmount;
+        if (okPromotion && add) {
+            nonPromotionCount = 0;
+        }
         removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount, bundle, promotionProduct, okPromotion);
     }
 
     private void removeNormalProduct(RequestItem requestItem, Receipt receipt, int nonPromotionCount,
                                      int nonPromotionAmount, int bundle, Product product, boolean okPromotion) {
         int remainRequestSize = remainRequestCount(requestItem, receipt);
-        if (!okPromotion && ((bundle > 2 && nonPromotionCount != 0) || remainRequestSize > 0)) {
+        if (okPromotion && (bundle > 2 && nonPromotionCount != 0)) {
             OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize + nonPromotionCount);
             askRemoval(requestItem, remainRequestSize, nonPromotionCount, nonPromotionAmount, receipt, product);
         }
