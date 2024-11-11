@@ -1,7 +1,6 @@
 package store.controller;
 
 import store.handler.StoreHandler;
-import store.service.StoreService;
 
 public class StoreController {
     private final StoreHandler storeHandler;
@@ -10,72 +9,9 @@ public class StoreController {
     }
     public void run() {
         storeHandler.handleInitialize();
-
         storeHandler.handleRequestProduct();
-
         storeHandler.handleCalculation();
-
-//        Receipt receipt = new Receipt(requestItems);
-//        for (RequestItem requestItem : requestItems) {
-//            // 프로모션 재고가 있는 경우 -> 프로모션 상품 먼저 소진
-//            if (storeService.containsPromotion(products, promotions, requestItem)) {
-//                Product promotionProduct = storeService.getPromotionProduct(products, requestItem.getName());
-//                Promotion promotion = storeService.getPromotion(promotions, promotionProduct.getPromotion());
-//                int bundle = promotion.getBuy() + promotion.getGet();
-//                int requestSize = requestItem.getQuantity();
-//                // 1. 프로모션 상품이 충분한 경우
-//                // 2. (배수-1) 의 수량을 만족하는 경우
-//                // 프로모션 상품 추가여부 묻는 경우는 계산 완료된 것. ( 이 경우만 따로 고려하지 말고, request item+1 이후에 계산할것. )
-//                if (promotionProduct.getQuantity() >= requestSize && requestSize % bundle == bundle - 1) {
-//                    OutputView.printInputAdd();
-//                    String addInput = InputView.getUserInput();
-//                    boolean isGiftSelected = ParseUtil.booleanParse(addInput);
-//                    if (isGiftSelected) {
-//                        requestItem.plusQuantity(1);
-//                    }
-//                }
-//                // 프로모션 상품 계산
-//                storeService.calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
-//
-//                // 일반 상품으로 계산해야 하는 상품이 남는 경우 -> 입출력
-//                int remainRequestSize = storeService.remainRequestCount(requestItem, receipt);
-//                if (remainRequestSize > 0) {
-//                    OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize);
-//                    String NonePromotionInput = InputView.getUserInput();
-//                    boolean purchaseRegularPrice = ParseUtil.booleanParse(NonePromotionInput);
-//                    // none promotion product 포함시키지 않는 경우 -> 해당 사이즈 만큼 제외.
-//                    if (!purchaseRegularPrice) {
-//                        requestItem.minusQuantity(remainRequestSize);
-//                    }
-//                }
-//            }
-//            // 일반 상품 계산
-//            Product normalProduct = storeService.getNomalProduct(products, requestItem.getName());
-//            storeService.calculateNormalProduct(normalProduct, requestItem, receipt);
-//
-//        }
-            // 멤버십 할인 적용 여부 -> 입출력 (storeHandler.handleCalculation()에 멤버십 할인 포함되어있음.)
-//        OutputView.printInputMembershipDiscount();
-//        String isMembershipInput = InputView.getUserInput();
-//        boolean isMembership = ParseUtil.booleanParse(isMembershipInput);
-//        if (isMembership) {
-//            storeService.membershipDiscount(receipt);
-//        }
-
-            // 영수증 출력
-            storeHandler.handlePrintReceipt();
-
-
-            // 재구매
-            storeHandler.handleRepurchase();
-//        OutputView.printInputRepurchase();
-//        String repurchaseInput = InputView.getUserInput();
-//        boolean isRepurchase = ParseUtil.booleanParse(repurchaseInput);
-
-
-
-
-
-
+        storeHandler.handlePrintReceipt();
+        storeHandler.handleRepurchase();
     }
 }
