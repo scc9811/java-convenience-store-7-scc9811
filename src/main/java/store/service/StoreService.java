@@ -208,31 +208,33 @@ public class StoreService {
         int remainRequestCount = remainRequestCount(requestItem, receipt);
         int nonPromotionCount = (requestSize - remainRequestCount) % bundle;
         int nonPromotionAmount = nonPromotionCount * promotionProduct.getPrice();
-        removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount, bundle);
+        removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount, bundle, promotionProduct);
     }
 
     private void removeNormalProduct(RequestItem requestItem, Receipt receipt, int nonPromotionCount,
-                                     int nonPromotionAmount, int bundle) {
+                                     int nonPromotionAmount, int bundle, Product product) {
         int remainRequestSize = remainRequestCount(requestItem, receipt);
         if ((bundle > 2 && nonPromotionCount != 0) || remainRequestSize > 0) {
             OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize + nonPromotionCount);
-            askRemoval(requestItem, remainRequestSize, nonPromotionCount, nonPromotionAmount, receipt);
+            askRemoval(requestItem, remainRequestSize, nonPromotionCount, nonPromotionAmount, receipt, product);
         }
     }
 
     private void askRemoval(RequestItem requestItem, int remainRequestSize,
-                            int nonPromotionCount, int nonPromotionAmount, Receipt receipt) {
+                            int nonPromotionCount, int nonPromotionAmount, Receipt receipt, Product product) {
         String nonPromotionInput = isRemovalProduct();
         boolean purchaseRegularPrice = ParseUtil.booleanParse(nonPromotionInput);
         if (!purchaseRegularPrice) {
-            updateMinusReceipt(requestItem,remainRequestSize + nonPromotionCount, receipt, nonPromotionAmount);
+            updateMinusReceipt(requestItem,remainRequestSize + nonPromotionCount, receipt, nonPromotionAmount, product);
             Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
             purchasedCount.put(requestItem.getName(), purchasedCount.get(requestItem.getName()) - nonPromotionCount);
         }
     }
 
-    private static void updateMinusReceipt(RequestItem item, int size, Receipt receipt, int nonPromotionAmount) {
+    private static void updateMinusReceipt(RequestItem item, int size, Receipt receipt,
+                                           int nonPromotionAmount, Product product) {
         item.minusQuantity(size);
+        product.plusQuantity(size);
         receipt.totalPurchaseAmount -= nonPromotionAmount;
         receipt.promotionalAmount -= nonPromotionAmount;
         receipt.nonPromotionalAmount -= nonPromotionAmount;
