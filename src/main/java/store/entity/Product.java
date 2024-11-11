@@ -41,16 +41,24 @@ public class Product {
     }
 
     public String info() {
-        String productInfo = "- " + name + " " + ParseUtil.numberFormat(price) + "원 ";
+        StringBuilder productInfoBuilder = new StringBuilder("- " + name + " " + ParseUtil.numberFormat(price) + "원 ");
+        addQuantityInfo(productInfoBuilder);
+        addPromotionInfo(productInfoBuilder);
+        return productInfoBuilder.toString();
+    }
+
+    private void addQuantityInfo(StringBuilder builder) {
         if (quantity == 0) {
-            productInfo = productInfo + "재고 없음 ";
+            builder.append("재고 없음 ");
         }
         if (quantity != 0) {
-            productInfo = productInfo + ParseUtil.numberFormat(quantity) + "개 ";
+            builder.append(ParseUtil.numberFormat(quantity)).append("개 ");
         }
+    }
+
+    private void addPromotionInfo(StringBuilder builder) {
         if (promotion != null) {
-            productInfo = productInfo + promotion;
+            builder.append(promotion);
         }
-        return productInfo;
     }
 }
