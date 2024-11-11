@@ -231,8 +231,8 @@ public class StoreService {
         }
     }
 
-    private static void updateMinusReceipt(RequestItem requestItem, int size, Receipt receipt, int nonPromotionAmount) {
-        requestItem.minusQuantity(size);
+    private static void updateMinusReceipt(RequestItem item, int size, Receipt receipt, int nonPromotionAmount) {
+        item.minusQuantity(size);
         receipt.totalPurchaseAmount -= nonPromotionAmount;
         receipt.promotionalAmount -= nonPromotionAmount;
         receipt.nonPromotionalAmount -= nonPromotionAmount;
