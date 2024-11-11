@@ -70,17 +70,24 @@ public class StoreService {
                 Integer.parseInt(purchaseTokens.get(1))));
     }
 
-
-    // 가능한 최대한 프로모션 상품 결제.
-    public void calculatePromotionProduct(Product promotionProduct, Promotion promotion, RequestItem requestItem, Receipt receipt) {
+    public void calculatePromotionProduct(Product promotionProduct, Promotion promotion,
+                                          RequestItem requestItem, Receipt receipt) {
         int calculateQuantity = Math.min(requestItem.getQuantity(), promotionProduct.getQuantity());
         receipt.totalPurchaseAmount += promotionProduct.getPrice() * calculateQuantity;
         int bundle = promotion.getBuy() + promotion.getGet();
         int presentedProductCount = calculateQuantity / bundle;
         receipt.eventDisCount += promotionProduct.getPrice() * presentedProductCount;
-        if (presentedProductCount > 0) {
-            receipt.getPresentedProducts().add(new PresentedProduct(promotionProduct.getName(), presentedProductCount));
+        addPresentedProduct(promotionProduct, receipt, presentedProductCount);
+        increasePurchasedCount(promotionProduct, receipt, calculateQuantity);
+    }
+
+    private void addPresentedProduct(Product promotionProduct, Receipt receipt, int productCount) {
+        if (productCount > 0) {
+            receipt.getPresentedProducts().add(new PresentedProduct(promotionProduct.getName(), productCount));
         }
+    }
+
+    private void increasePurchasedCount(Product promotionProduct, Receipt receipt, int calculateQuantity) {
         Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
         int lastCount = purchasedCount.get(promotionProduct.getName());
         purchasedCount.put(promotionProduct.getName(), lastCount + calculateQuantity);
@@ -88,29 +95,25 @@ public class StoreService {
     }
 
     public void calculateNormalProduct(Product normalProduct, RequestItem requestItem, Receipt receipt) {
-        // 이미 구매 완료한 경우 바로 Return
         if (receipt.getPurchasedCount().get(requestItem.getName()) == requestItem.getQuantity()) {
             return;
         }
-        // 구매하야 할 수량 남은 경우 계산
-        Map<String, Integer> purchasedCount = receipt.getPurchasedCount();
-        int lastCount = purchasedCount.get(normalProduct.getName());
+        int lastCount = receipt.getPurchasedCount().get(normalProduct.getName());
         int calculateQuantity = requestItem.getQuantity() - lastCount;
         receipt.totalPurchaseAmount += normalProduct.getPrice() * calculateQuantity;
-        purchasedCount.put(normalProduct.getName(), lastCount + calculateQuantity);
+        receipt.getPurchasedCount().put(normalProduct.getName(), lastCount + calculateQuantity);
         normalProduct.minusQuantity(calculateQuantity);
     }
 
     public boolean containsPromotion(List<Product> products, List<Promotion> promotions, RequestItem requestItem) {
         Product promotionProduct = getPromotionProduct(products, requestItem.getName());
-        if (promotionProduct == null) {
-            return false;
+        if (promotionProduct != null) {
+            Promotion promotion = getPromotion(promotions, promotionProduct.getPromotion());
+            if (!(today.isBefore(promotion.getStartDate()) || today.isAfter(promotion.getEndDate()))) {
+                return true;
+            }
         }
-        Promotion promotion = getPromotion(promotions, promotionProduct.getPromotion());
-        if (today.isBefore(promotion.getStartDate()) || today.isAfter(promotion.getEndDate())) {
-            return false;
-        }
-        return true;
+        return false;
     }
 
     public Product getNomalProduct(List<Product> products, String name) {
@@ -151,19 +154,26 @@ public class StoreService {
             Product currentProduct = products.get(i);
             Product nextProduct = products.get(i + 1);
             if (currentProduct.getPromotion() != null && !currentProduct.getName().equals(nextProduct.getName())) {
-                products.add(i + 1, new Product(currentProduct.getName(), currentProduct.getPrice(), 0, "null"));
+                addProduct(products, i, currentProduct);
                 i += 1;
             }
         }
     }
 
-    public void treatRequest(List<Product> products, List<Promotion> promotions, List<RequestItem> requestItems, Receipt receipt) {
+    private void addProduct(List<Product> products, int i, Product currentProduct) {
+        products.add(i + 1, new Product(currentProduct.getName(),
+                currentProduct.getPrice(), 0, "null"));
+    }
+
+    public void treatRequest(List<Product> products, List<Promotion> promotions,
+                             List<RequestItem> requestItems, Receipt receipt) {
         for (RequestItem requestItem : requestItems) {
             eachRequestItem(products, promotions, requestItem, receipt);
         }
     }
 
-    private void eachRequestItem(List<Product> products, List<Promotion> promotions, RequestItem requestItem, Receipt receipt) {
+    private void eachRequestItem(List<Product> products, List<Promotion> promotions,
+                                 RequestItem requestItem, Receipt receipt) {
         // 프로모션 재고가 있는 경우 -> 프로모션 상품 먼저 소진
         if (containsPromotion(products, promotions, requestItem)) {
             sellPromotionProduct(products, promotions, requestItem, receipt);
@@ -171,7 +181,8 @@ public class StoreService {
         sellNormalProduct(products, requestItem, receipt);
     }
 
-    private void sellPromotionProduct(List<Product> products, List<Promotion> promotions, RequestItem requestItem, Receipt receipt) {
+    private void sellPromotionProduct(List<Product> products, List<Promotion> promotions,
+                                      RequestItem requestItem, Receipt receipt) {
         Product promotionProduct = getPromotionProduct(products, requestItem.getName());
         Promotion promotion = getPromotion(promotions, promotionProduct.getPromotion());
         int bundle = promotion.getBuy() + promotion.getGet();
@@ -204,12 +215,12 @@ public class StoreService {
             return nonPromotionInput;
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-            isRemovalProduct();
+            return isRemovalProduct();
         }
-        return null;
     }
 
-    private void addPromotionProduct(Product promotionProduct, RequestItem requestItem, int bundle, int requestSize) {
+    private void addPromotionProduct(Product promotionProduct, RequestItem requestItem,
+                                     int bundle, int requestSize) {
         if (promotionProduct.getQuantity() >= requestSize + 1 && requestSize % bundle == bundle - 1) {
             OutputView.printInputAdd(promotionProduct.getName());
             repeatAskPromotionProductAddition(requestItem);
