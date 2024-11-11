@@ -133,8 +133,7 @@ public class StoreService {
 
     public void membershipDiscount(Receipt receipt) {
         int priceToApplyMembership = receipt.getTotalPurchaseAmount() - receipt.getEventDisCount();
-        int disCountPrice = Math.max((int) Math.round(priceToApplyMembership * 0.7), 8000);
-        int disCountPrice = Math.min((int) Math.round(priceToApplyMembership * 0.7), 8000);
+        int disCountPrice = Math.min((int) Math.round(priceToApplyMembership * 0.3), 8000);
         receipt.setMembershipDiscount(disCountPrice);
     }
 
