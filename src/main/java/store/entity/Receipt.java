@@ -14,9 +14,6 @@ public class Receipt {
     public Receipt(List<RequestItem> requestItems) {
         this.requestItems = requestItems;
         this.presentedProducts = new ArrayList<>();
-        this.totalPurchaseAmount = 0;
-        this.eventDisCount = 0;
-        this.membershipDiscount = 0;
         this.purchasedCount = new HashMap<>();
         for (RequestItem requestItem : requestItems) {
             purchasedCount.put(requestItem.getName(), 0);
