@@ -203,18 +203,18 @@ public class StoreService {
 
     private void sellPromotionProductByBundle(Product promotionProduct, Promotion promotion,
                                               RequestItem requestItem, Receipt receipt, int bundle, int requestSize) {
-        addPromotionProduct(promotionProduct, requestItem, bundle, requestSize);
+        boolean okPromotion = addPromotionProduct(promotionProduct, requestItem, bundle, requestSize);
         calculatePromotionProduct(promotionProduct, promotion, requestItem, receipt);
         int remainRequestCount = remainRequestCount(requestItem, receipt);
         int nonPromotionCount = (requestSize - remainRequestCount) % bundle;
         int nonPromotionAmount = nonPromotionCount * promotionProduct.getPrice();
-        removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount, bundle, promotionProduct);
+        removeNormalProduct(requestItem, receipt, nonPromotionCount, nonPromotionAmount, bundle, promotionProduct, okPromotion);
     }
 
     private void removeNormalProduct(RequestItem requestItem, Receipt receipt, int nonPromotionCount,
-                                     int nonPromotionAmount, int bundle, Product product) {
+                                     int nonPromotionAmount, int bundle, Product product, boolean okPromotion) {
         int remainRequestSize = remainRequestCount(requestItem, receipt);
-        if ((bundle > 2 && nonPromotionCount != 0) || remainRequestSize > 0) {
+        if (!okPromotion && ((bundle > 2 && nonPromotionCount != 0) || remainRequestSize > 0)) {
             OutputView.printInputNonePromotion(requestItem.getName(), remainRequestSize + nonPromotionCount);
             askRemoval(requestItem, remainRequestSize, nonPromotionCount, nonPromotionAmount, receipt, product);
         }
@@ -251,29 +251,31 @@ public class StoreService {
         }
     }
 
-    private void addPromotionProduct(Product promotionProduct, RequestItem requestItem,
+    private boolean addPromotionProduct(Product promotionProduct, RequestItem requestItem,
                                      int bundle, int requestSize) {
         if (promotionProduct.getQuantity() >= requestSize + 1 && requestSize % bundle == bundle - 1) {
             OutputView.printInputAdd(promotionProduct.getName());
-            repeatAskPromotionProductAddition(requestItem);
+            return repeatAskPromotionProductAddition(requestItem);
         }
+        return false;
     }
 
-    private void repeatAskPromotionProductAddition(RequestItem requestItem) {
+    private boolean repeatAskPromotionProductAddition(RequestItem requestItem) {
         try {
-            askPromotionProductAddition(requestItem);
+            return askPromotionProductAddition(requestItem);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-            askPromotionProductAddition(requestItem);
+            return askPromotionProductAddition(requestItem);
         }
     }
 
-    private void askPromotionProductAddition(RequestItem requestItem) {
+    private boolean askPromotionProductAddition(RequestItem requestItem) {
         String addInput = isPromotionProductionAddition();
         boolean isGiftSelected = ParseUtil.booleanParse(addInput);
         if (isGiftSelected) {
             requestItem.plusQuantity(1);
         }
+        return isGiftSelected;
     }
 
     private String isPromotionProductionAddition() {
