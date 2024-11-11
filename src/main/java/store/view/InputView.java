@@ -1,6 +1,7 @@
 package store.view;
 
 import camp.nextstep.edu.missionutils.Console;
+import store.util.ParseUtil;
 
 public class InputView {
     private InputView() {
@@ -8,6 +9,6 @@ public class InputView {
 
     public static String getUserInput() {
         String input = Console.readLine();
-        return input;
+        return ParseUtil.removeSpace(input);
     }
 }

@@ -17,7 +17,6 @@ public class ParseUtil {
     }
 
     public static boolean booleanParse(String addInput) {
-        addInput = removeSpace(addInput);
         if (addInput.equals("N")) {
             return false;
         }
