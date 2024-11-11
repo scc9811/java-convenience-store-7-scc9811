@@ -35,7 +35,7 @@ public class ParseValidator {
     }
 
     private static boolean isValidRange(int n) {
-        if (n > MIN) {
+        if (n >= MIN) {
             return true;
         }
         return false;
