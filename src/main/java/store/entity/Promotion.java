@@ -6,6 +6,7 @@ public class Promotion {
     final String name;
     final int buy, get;
     final LocalDate startDate, endDate;
+
     public Promotion(String name, int buy, int get, String startDate, String endDate) {
         this.name = name;
         this.buy = buy;

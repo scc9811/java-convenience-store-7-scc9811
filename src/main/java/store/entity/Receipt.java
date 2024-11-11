@@ -10,6 +10,7 @@ public class Receipt {
     private final List<PresentedProduct> presentedProducts;
     private final Map<String, Integer> purchasedCount;
     public int totalPurchaseAmount, eventDisCount, membershipDiscount;
+
     public Receipt(List<RequestItem> requestItems) {
         this.requestItems = requestItems;
         this.presentedProducts = new ArrayList<>();

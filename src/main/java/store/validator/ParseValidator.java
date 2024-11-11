@@ -32,8 +32,7 @@ public class ParseValidator {
         try {
             int n = Integer.parseInt(s);
             return isValidRange(n);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return false;
         }
     }
